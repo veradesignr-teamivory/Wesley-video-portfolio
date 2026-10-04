@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion';
+import { motion, useInView, useScroll, useTransform, type MotionValue } from 'framer-motion';
 import { WordsPullUpMultiStyle } from './WordsPullUp';
 import { about } from '../content';
 import { useSite } from '../store';
@@ -26,25 +26,42 @@ export function About() {
   const { scrollYProgress } = useScroll({ target: bodyRef, offset: ['start 0.8', 'end 0.2'] });
   const body = about.body.replace('{site}', useSite().data.settings.siteName);
   const chars = body.split('');
+  const photoRef = useRef<HTMLDivElement>(null);
+  const photoInView = useInView(photoRef, { once: true, margin: '-80px' });
 
   return (
     <section id="about" className="bg-black px-4 md:px-6 py-10 sm:py-16 md:py-20">
-      <div className="bg-[#101010] max-w-6xl mx-auto text-center rounded-2xl md:rounded-[2rem] px-5 sm:px-10 md:px-16 py-16 sm:py-24 md:py-32">
-        <p className="text-primary text-[10px] sm:text-xs mb-8 sm:mb-10">{about.label}</p>
+      <div className="bg-[#101010] max-w-6xl mx-auto rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 grid lg:grid-cols-[minmax(0,24rem)_1fr] gap-8 lg:gap-12 items-center">
+        {/* portrait — cropped from the top so the event watermark at the bottom of the photo stays out of frame */}
+        <motion.div
+          ref={photoRef}
+          className="relative w-full max-w-sm mx-auto lg:max-w-none aspect-[43/50] rounded-2xl md:rounded-[1.5rem] overflow-hidden bg-black"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={photoInView ? { opacity: 1, scale: 1 } : undefined}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <img src={about.portrait} alt={about.portraitAlt} loading="lazy" className="absolute inset-0 w-full h-full object-cover object-top" />
+          <div className="noise-overlay absolute inset-0 opacity-30 mix-blend-overlay pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+        </motion.div>
 
-        <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl max-w-3xl mx-auto leading-[0.95] sm:leading-[0.9] text-[#E1E0CC]">
-          <WordsPullUpMultiStyle segments={about.heading} />
+        <div className="text-center lg:text-left pb-8 lg:pb-0 lg:pr-6">
+        <p className="text-primary text-[10px] sm:text-xs mb-6 sm:mb-8">{about.label}</p>
+
+        <h2 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl max-w-3xl mx-auto lg:mx-0 leading-[0.95] sm:leading-[0.9] text-[#E1E0CC]">
+          <WordsPullUpMultiStyle segments={about.heading} className="lg:justify-start lg:-ml-[0.125em]" />
         </h2>
 
         <p
           ref={bodyRef}
           aria-label={body}
-          className="text-[#DEDBC8] text-xs sm:text-sm md:text-base max-w-2xl mx-auto mt-10 sm:mt-14 leading-relaxed"
+          className="text-[#DEDBC8] text-xs sm:text-sm md:text-base max-w-2xl mx-auto lg:mx-0 mt-8 sm:mt-10 leading-relaxed"
         >
           {chars.map((char, i) => (
             <AnimatedLetter key={i} char={char} index={i} total={chars.length} progress={scrollYProgress} />
           ))}
         </p>
+        </div>
       </div>
     </section>
   );

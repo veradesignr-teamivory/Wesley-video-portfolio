@@ -24,6 +24,8 @@ export const hero = {
 
 export const about = {
   label: 'Video editing & motion design',
+  portrait: '/wesley.jpg', // file lives in /public
+  portraitAlt: 'Wesley Tekena Junior holding a notebook and pen',
   heading: [
     { text: 'I am Wesley Tekena Junior,', className: 'font-normal' },
     { text: 'an editor and motion designer.', className: 'italic font-serif' },
