@@ -31,31 +31,32 @@ export function About() {
 
   return (
     <section id="about" className="bg-black px-4 md:px-6 py-10 sm:py-16 md:py-20">
-      <div className="bg-[#101010] max-w-6xl mx-auto rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 grid lg:grid-cols-[minmax(0,24rem)_1fr] gap-8 lg:gap-12 items-center">
-        {/* portrait — cropped from the top so the event watermark at the bottom of the photo stays out of frame */}
+      <div className="bg-[#101010] max-w-6xl mx-auto rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 grid sm:grid-cols-[2fr_3fr] lg:grid-cols-[minmax(0,26rem)_1fr] gap-6 sm:gap-8 lg:gap-12 items-stretch">
+        {/* portrait on one side, text on the other (stacks only on phones).
+            The photo is scaled from the top so the event watermark at its bottom edge stays out of frame. */}
         <motion.div
           ref={photoRef}
-          className="relative w-full max-w-sm mx-auto lg:max-w-none aspect-[43/50] rounded-2xl md:rounded-[1.5rem] overflow-hidden bg-black"
+          className="relative w-full max-w-sm mx-auto sm:max-w-none aspect-[43/50] sm:aspect-auto sm:h-full sm:min-h-[20rem] rounded-2xl md:rounded-[1.5rem] overflow-hidden bg-black"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={photoInView ? { opacity: 1, scale: 1 } : undefined}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         >
-          <img src={about.portrait} alt={about.portraitAlt} loading="lazy" className="absolute inset-0 w-full h-full object-cover object-top" />
+          <img src={about.portrait} alt={about.portraitAlt} loading="lazy" className="absolute inset-0 w-full h-full object-cover object-top scale-[1.12] origin-top" />
           <div className="noise-overlay absolute inset-0 opacity-30 mix-blend-overlay pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
         </motion.div>
 
-        <div className="text-center lg:text-left pb-8 lg:pb-0 lg:pr-6">
+        <div className="text-center sm:text-left pb-8 sm:py-6 md:py-10 lg:py-14 sm:pr-4 lg:pr-6 self-center">
         <p className="text-primary text-[10px] sm:text-xs mb-6 sm:mb-8">{about.label}</p>
 
-        <h2 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl max-w-3xl mx-auto lg:mx-0 leading-[0.95] sm:leading-[0.9] text-[#E1E0CC]">
-          <WordsPullUpMultiStyle segments={about.heading} className="lg:justify-start lg:-ml-[0.125em]" />
+        <h2 className="text-3xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl max-w-3xl mx-auto sm:mx-0 leading-[0.95] sm:leading-[0.9] text-[#E1E0CC]">
+          <WordsPullUpMultiStyle segments={about.heading} className="sm:justify-start sm:-ml-[0.125em]" />
         </h2>
 
         <p
           ref={bodyRef}
           aria-label={body}
-          className="text-[#DEDBC8] text-xs sm:text-sm md:text-base max-w-2xl mx-auto lg:mx-0 mt-8 sm:mt-10 leading-relaxed"
+          className="text-[#DEDBC8] text-xs sm:text-sm md:text-base max-w-2xl mx-auto sm:mx-0 mt-6 md:mt-10 leading-relaxed"
         >
           {chars.map((char, i) => (
             <AnimatedLetter key={i} char={char} index={i} total={chars.length} progress={scrollYProgress} />
