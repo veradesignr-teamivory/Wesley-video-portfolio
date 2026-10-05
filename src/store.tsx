@@ -14,6 +14,8 @@ export interface Project {
   description: string;
   /** YouTube / Vimeo URL — opens in a player when the card is clicked */
   videoUrl: string;
+  /** self-hosted clip: path under /public (e.g. /work/clip.mp4) or a direct .mp4 URL — plays on hover and in the player */
+  video: string;
   /** thumbnail: image URL, /public path or uploaded data URI (optional) */
   image: string;
 }
@@ -43,12 +45,14 @@ export const DEFAULTS: SiteData = {
     ],
   },
   projects: [ // (placeholder projects — replace or delete from the admin dashboard)
-    { id: 'p1', title: 'Northbound', client: 'Outdoor brand', category: 'Commercial', year: '2026', role: 'Editor · Colorist', description: 'A 60-second winter campaign film with 15- and 6-second cutdowns for broadcast and paid social.', videoUrl: '', image: '' },
-    { id: 'p2', title: 'Afterglow', client: 'Recording artist', category: 'Music Video', year: '2026', role: 'Editor · VFX', description: 'Performance and narrative intercut, with a dream sequence built on light leaks and frame blending.', videoUrl: '', image: '' },
-    { id: 'p3', title: 'Build Mode', client: 'Tech creator', category: 'YouTube', year: '2025', role: 'Lead Editor', description: 'A weekly long-form series: sharper pacing and a consistent graphics language across every episode.', videoUrl: '', image: '' },
-    { id: 'p4', title: 'Made Slow', client: 'Coffee roaster', category: 'Brand Film', year: '2025', role: 'Editor · Sound', description: 'A three-minute brand documentary with an interview-led edit, sound design and a warm film grade.', videoUrl: '', image: '' },
-    { id: 'p5', title: 'Drop 07', client: 'Athletics label', category: 'Social', year: '2026', role: 'Editor · Motion', description: 'Eighteen vertical edits for a launch week, with kinetic captions and a shared type system.', videoUrl: '', image: '' },
-    { id: 'p6', title: 'Signal / Noise', client: 'Fintech platform', category: 'Motion', year: '2025', role: 'Motion Designer', description: 'A 75-second animated explainer and launch title sequence, from storyboards to sound design.', videoUrl: '', image: '' },
+    { id: 'v1', title: 'Rain to Gold', client: '', category: 'Color Grading', year: '2026', role: 'Colorist', description: 'A rainy city street taken from a flat log profile to a warm, golden-hour grade, with the transition played out in a single shot.', videoUrl: '', video: '/work/city-street-grade.mp4', image: '/work/city-street-grade.jpg' },
+    { id: 'v2', title: 'Into the Frame', client: '', category: 'Editing', year: '2026', role: 'Editor', description: 'One continuous push from the editing timeline into the shot itself: from the cut, through the program monitor, out onto the open road.', videoUrl: '', video: '/work/into-the-edit.mp4', image: '/work/into-the-edit.jpg' },
+    { id: 'p1', title: 'Northbound', client: 'Outdoor brand', category: 'Commercial', year: '2026', role: 'Editor · Colorist', description: 'A 60-second winter campaign film with 15- and 6-second cutdowns for broadcast and paid social.', videoUrl: '', video: '', image: '' },
+    { id: 'p2', title: 'Afterglow', client: 'Recording artist', category: 'Music Video', year: '2026', role: 'Editor · VFX', description: 'Performance and narrative intercut, with a dream sequence built on light leaks and frame blending.', videoUrl: '', video: '', image: '' },
+    { id: 'p3', title: 'Build Mode', client: 'Tech creator', category: 'YouTube', year: '2025', role: 'Lead Editor', description: 'A weekly long-form series: sharper pacing and a consistent graphics language across every episode.', videoUrl: '', video: '', image: '' },
+    { id: 'p4', title: 'Made Slow', client: 'Coffee roaster', category: 'Brand Film', year: '2025', role: 'Editor · Sound', description: 'A three-minute brand documentary with an interview-led edit, sound design and a warm film grade.', videoUrl: '', video: '', image: '' },
+    { id: 'p5', title: 'Drop 07', client: 'Athletics label', category: 'Social', year: '2026', role: 'Editor · Motion', description: 'Eighteen vertical edits for a launch week, with kinetic captions and a shared type system.', videoUrl: '', video: '', image: '' },
+    { id: 'p6', title: 'Signal / Noise', client: 'Fintech platform', category: 'Motion', year: '2025', role: 'Motion Designer', description: 'A 75-second animated explainer and launch title sequence, from storyboards to sound design.', videoUrl: '', video: '', image: '' },
   ],
   experience: [ // (placeholder)
     { id: 'e1', role: 'Founder · Lead Editor & Motion Designer', company: 'Oversabi Studio', period: '2021 — Present', description: 'Independent post-production studio delivering edit, motion, color and sound for brands, artists and creators worldwide.' },
@@ -110,7 +114,7 @@ export function normalize(raw: unknown): SiteData {
           return o as T;
         })
       : null;
-  d.projects = list<Project>(r.projects, ['title', 'client', 'category', 'year', 'role', 'description', 'videoUrl', 'image']) ?? d.projects;
+  d.projects = list<Project>(r.projects, ['title', 'client', 'category', 'year', 'role', 'description', 'videoUrl', 'video', 'image']) ?? d.projects;
   d.experience = list<Experience>(r.experience, ['role', 'company', 'period', 'description']) ?? d.experience;
   d.education = list<Education>(r.education, ['title', 'school', 'period', 'description']) ?? d.education;
   d.clients = list<Client>(r.clients, ['name', 'logo', 'url'], ['invert']) ?? d.clients;

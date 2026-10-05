@@ -106,6 +106,7 @@ const COLLECTIONS: Record<CollectionKey, { label: string; one: string; newestFir
       { key: 'year', label: 'Year' },
       { key: 'role', label: 'Your role', placeholder: 'Editor · Colorist' },
       { key: 'videoUrl', label: 'YouTube / Vimeo link', kind: 'url', placeholder: 'https://…' },
+      { key: 'video', label: '…or a video file (.mp4 link, or /work/name.mp4 placed in the public folder)', placeholder: '/work/my-clip.mp4' },
       { key: 'image', label: 'Thumbnail image', kind: 'image' },
       { key: 'description', label: 'Description', kind: 'textarea' },
     ],

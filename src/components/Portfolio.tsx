@@ -8,11 +8,21 @@ function Card({ project, index, onOpen }: { project: Project; index: number; onO
   const ref = useRef<HTMLButtonElement>(null);
   const inView = useInView(ref, { once: true, margin: '-80px' });
   const image = safeUrl(project.image, true);
+  const video = safeUrl(project.video);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const preview = (on: boolean) => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (on) v.play().catch(() => {});
+    else { v.pause(); v.currentTime = 0; }
+  };
 
   return (
     <motion.button
       ref={ref}
       onClick={onOpen}
+      onMouseEnter={() => preview(true)} onMouseLeave={() => preview(false)}
+      onFocus={() => preview(true)} onBlur={() => preview(false)}
       className="group text-left bg-[#212121] rounded-2xl overflow-hidden flex flex-col"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={inView ? { opacity: 1, scale: 1 } : undefined}
@@ -21,16 +31,21 @@ function Card({ project, index, onOpen }: { project: Project; index: number; onO
       <div className="relative aspect-video overflow-hidden bg-[#101010]">
         {image ? (
           <img src={image} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-        ) : (
+        ) : video ? null : (
           // placeholder frame until a thumbnail is added in the admin dashboard
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#2a2a2a] via-[#151515] to-black">
             <div className="noise-overlay absolute inset-0 opacity-40 mix-blend-overlay" />
             <span className="relative font-serif italic text-3xl sm:text-4xl text-primary/80 px-4 text-center">{project.title}</span>
           </div>
         )}
+        {video && (
+          // silent preview that plays while the card is hovered or focused
+          <video ref={videoRef} src={video} muted loop playsInline preload={image ? 'none' : 'metadata'}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${image ? 'opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100' : ''}`} />
+        )}
         <span className="absolute top-3 left-3 bg-black/70 text-primary rounded-full px-3 py-1 text-[10px] sm:text-xs">{project.category}</span>
         <span className="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-primary text-black flex items-center justify-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 group-focus-visible:opacity-100 group-focus-visible:translate-y-0 transition-all">
-          {toEmbed(project.videoUrl) ? <Play className="w-4 h-4" /> : <ArrowRight className="w-4 h-4 -rotate-45" />}
+          {toEmbed(project.videoUrl) || video ? <Play className="w-4 h-4" /> : <ArrowRight className="w-4 h-4 -rotate-45" />}
         </span>
       </div>
       <div className="p-5 sm:p-6 flex-1 flex flex-col">
@@ -49,6 +64,7 @@ function Lightbox({ project, onClose }: { project: Project; onClose: () => void 
   const closeRef = useRef<HTMLButtonElement>(null);
   const embed = toEmbed(project.videoUrl);
   const image = safeUrl(project.image, true);
+  const video = safeUrl(project.video);
 
   useEffect(() => {
     const prev = document.activeElement as HTMLElement | null;
@@ -70,6 +86,8 @@ function Lightbox({ project, onClose }: { project: Project; onClose: () => void 
         <div className="relative aspect-video bg-black">
           {embed ? (
             <iframe src={embed} title={project.title} allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowFullScreen className="absolute inset-0 w-full h-full border-0" />
+          ) : video ? (
+            <video src={video} poster={image || undefined} controls autoPlay playsInline className="absolute inset-0 w-full h-full bg-black" />
           ) : image ? (
             <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover" />
           ) : (
