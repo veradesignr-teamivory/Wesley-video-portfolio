@@ -8,7 +8,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 export interface LinkItem { id: string; label: string; url: string }
-export interface Settings { siteName: string; heroTitle: string; email: string; /** international format, e.g. +44 7000 000000 */ whatsapp: string; links: LinkItem[] }
+export interface Settings { siteName: string; heroTitle: string; email: string; /** international format, e.g. +44 7000 000000 */ whatsapp: string; /** profile links shown with the visual design work */ behance: string; dribbble: string; links: LinkItem[] }
 export interface Project {
   id: string; title: string; client: string; category: string; year: string; role: string;
   description: string;
@@ -27,7 +27,11 @@ export interface Client {
   invert: boolean;
 }
 /** A still piece of visual design work (logo, brand, print, book, illustration, UI...). */
-export interface Design { id: string; title: string; category: string; client: string; image: string; description: string }
+export interface Design {
+  id: string; title: string; category: string; client: string; image: string; description: string;
+  /** optional: the live website, Figma file, Behance case study... */
+  link: string;
+}
 export interface SiteData {
   settings: Settings; projects: Project[]; designs: Design[]; experience: Experience[]; education: Education[]; clients: Client[];
 }
@@ -43,10 +47,11 @@ export const DEFAULTS: SiteData = {
     heroTitle: 'Wesley',
     email: 'veradesignr@gmail.com',
     whatsapp: '+44 7770208286',
+    behance: '',  // e.g. https://www.behance.net/yourname
+    dribbble: '', // e.g. https://dribbble.com/yourname
     links: [ // (placeholder URLs)
       { id: 'l1', label: 'YouTube', url: 'https://youtube.com/' },
       { id: 'l2', label: 'Instagram', url: 'https://instagram.com/' },
-      { id: 'l3', label: 'Behance', url: 'https://behance.net/' },
       { id: 'l4', label: 'Vimeo', url: 'https://vimeo.com/' },
       { id: 'l5', label: 'LinkedIn', url: 'https://linkedin.com/' },
     ],
@@ -69,20 +74,20 @@ export const DEFAULTS: SiteData = {
     { id: "v2", title: "Into the Frame", client: "", category: "Editing", year: "2026", role: "Editor", description: "One continuous push from the editing timeline into the shot itself: from the cut, through the program monitor, out onto the open road.", videoUrl: "", video: "/work/into-the-edit.mp4", image: "/work/into-the-edit.jpg" },
   ],
   designs: [ // visual design pieces: files live in /public/design
-    { id: "g1", title: "Rwanda: Small Country, Big Momentum", category: "Social Media Design", client: "NDI", image: "/design/rwanda-momentum.webp", description: "A carousel slide pairing headline figures with a map and skyline, in a dark green brand palette." },
-    { id: "g2", title: "Vibe It Up! Issue 64", category: "Print Design", client: "Wellness Practitioners Alliance", image: "/design/vibe-it-up-magazine.webp", description: "Magazine cover design and layout, shown as a printed mockup." },
-    { id: "g3", title: "There Has to Be a Better Way", category: "Illustration", client: "", image: "/design/better-way.webp", description: "A 3D-style character illustration of a school administrator buried in paperwork." },
-    { id: "g4", title: "Learning Platform: Course Catalogue", category: "UI Design", client: "", image: "/design/lms-catalogue.webp", description: "Course listing with category, level and price filters." },
-    { id: "g5", title: "Hello August", category: "Social Media Design", client: "Niger Delta Innovate", image: "/design/hello-august.webp", description: "A new-month greeting post with bold stacked type over a circuit pattern." },
-    { id: "g6", title: "Happy Teachers' Day", category: "Social Media Design", client: "", image: "/design/teachers-day.webp", description: "A Teachers' Day greeting built on a notebook-paper collage." },
-    { id: "g7", title: "Normal People vs Cybersecurity Engineer", category: "Illustration", client: "", image: "/design/cybersecurity-engineer.webp", description: "A two-panel cartoon contrasting a quiet night with life on security watch." },
-    { id: "g8", title: "Learning Platform: Student Profile", category: "UI Design", client: "", image: "/design/lms-profile.webp", description: "Student dashboard with course progress cards and status tabs." },
-    { id: "g9", title: "Before You Start, Make Research", category: "Social Media Design", client: "Binna", image: "/design/make-research.webp", description: "A designer-tip post with a lamp-lit desk scene and glowing call to action." },
-    { id: "g10", title: "I Prepared", category: "Illustration", client: "", image: "/design/i-prepared.webp", description: "An editorial cartoon about side incomes and job security." },
-    { id: "g11", title: "Learning Platform: Account Settings", category: "UI Design", client: "", image: "/design/lms-settings.webp", description: "Profile settings with cover photo, personal details and display name." },
-    { id: "g12", title: "Learning Platform: Lesson View", category: "UI Design", client: "", image: "/design/lms-lesson.webp", description: "Lesson page with course outline, progress and exercise files." },
-    { id: "g13", title: "Learning Platform: Student Registration", category: "UI Design", client: "", image: "/design/lms-registration.webp", description: "Sign-up form for new students." },
-    { id: "g14", title: "Learning Platform: Change Password", category: "UI Design", client: "", image: "/design/lms-password.webp", description: "Password settings inside the student account area." },
+    { id: "g1", title: "Rwanda: Small Country, Big Momentum", category: "Social Media Design", client: "NDI", image: "/design/rwanda-momentum.webp", description: "A carousel slide pairing headline figures with a map and skyline, in a dark green brand palette.", link: "" },
+    { id: "g2", title: "Vibe It Up! Issue 64", category: "Print Design", client: "Wellness Practitioners Alliance", image: "/design/vibe-it-up-magazine.webp", description: "Magazine cover design and layout, shown as a printed mockup.", link: "" },
+    { id: "g3", title: "There Has to Be a Better Way", category: "Illustration", client: "", image: "/design/better-way.webp", description: "A 3D-style character illustration of a school administrator buried in paperwork.", link: "" },
+    { id: "g4", title: "Learning Platform: Course Catalogue", category: "UI Design", client: "", image: "/design/lms-catalogue.webp", description: "Course listing with category, level and price filters.", link: "" },
+    { id: "g5", title: "Hello August", category: "Social Media Design", client: "Niger Delta Innovate", image: "/design/hello-august.webp", description: "A new-month greeting post with bold stacked type over a circuit pattern.", link: "" },
+    { id: "g6", title: "Happy Teachers' Day", category: "Social Media Design", client: "", image: "/design/teachers-day.webp", description: "A Teachers' Day greeting built on a notebook-paper collage.", link: "" },
+    { id: "g7", title: "Normal People vs Cybersecurity Engineer", category: "Illustration", client: "", image: "/design/cybersecurity-engineer.webp", description: "A two-panel cartoon contrasting a quiet night with life on security watch.", link: "" },
+    { id: "g8", title: "Learning Platform: Student Profile", category: "UI Design", client: "", image: "/design/lms-profile.webp", description: "Student dashboard with course progress cards and status tabs.", link: "" },
+    { id: "g9", title: "Before You Start, Make Research", category: "Social Media Design", client: "Binna", image: "/design/make-research.webp", description: "A designer-tip post with a lamp-lit desk scene and glowing call to action.", link: "" },
+    { id: "g10", title: "I Prepared", category: "Illustration", client: "", image: "/design/i-prepared.webp", description: "An editorial cartoon about side incomes and job security.", link: "" },
+    { id: "g11", title: "Learning Platform: Account Settings", category: "UI Design", client: "", image: "/design/lms-settings.webp", description: "Profile settings with cover photo, personal details and display name.", link: "" },
+    { id: "g12", title: "Learning Platform: Lesson View", category: "UI Design", client: "", image: "/design/lms-lesson.webp", description: "Lesson page with course outline, progress and exercise files.", link: "" },
+    { id: "g13", title: "Learning Platform: Student Registration", category: "UI Design", client: "", image: "/design/lms-registration.webp", description: "Sign-up form for new students.", link: "" },
+    { id: "g14", title: "Learning Platform: Change Password", category: "UI Design", client: "", image: "/design/lms-password.webp", description: "Password settings inside the student account area.", link: "" },
   ],
   experience: [ // (placeholder)
     { id: 'e1', role: 'Founder · Lead Editor & Motion Designer', company: 'Oversabi Studio', period: '2021 — Present', description: 'Independent post-production studio delivering edit, motion, color and sound for brands, artists and creators worldwide.' },
@@ -147,7 +152,7 @@ export function normalize(raw: unknown): SiteData {
   d.projects = list<Project>(r.projects, ['title', 'client', 'category', 'year', 'role', 'description', 'videoUrl', 'video', 'image']) ?? d.projects;
   d.experience = list<Experience>(r.experience, ['role', 'company', 'period', 'description']) ?? d.experience;
   d.education = list<Education>(r.education, ['title', 'school', 'period', 'description']) ?? d.education;
-  d.designs = list<Design>(r.designs, ['title', 'category', 'client', 'image', 'description']) ?? d.designs;
+  d.designs = list<Design>(r.designs, ['title', 'category', 'client', 'image', 'description', 'link']) ?? d.designs;
   d.clients = list<Client>(r.clients, ['name', 'logo', 'url'], ['invert']) ?? d.clients;
   if (r.settings && typeof r.settings === 'object') {
     const s = r.settings as Partial<Settings>;
@@ -155,6 +160,8 @@ export function normalize(raw: unknown): SiteData {
     d.settings.heroTitle = str(s.heroTitle) || d.settings.heroTitle;
     d.settings.email = str(s.email) || d.settings.email;
     if (typeof s.whatsapp === 'string') d.settings.whatsapp = s.whatsapp;
+    if (typeof s.behance === 'string') d.settings.behance = s.behance;
+    if (typeof s.dribbble === 'string') d.settings.dribbble = s.dribbble;
     d.settings.links = list<LinkItem>(s.links, ['label', 'url']) ?? d.settings.links;
   }
   return d;

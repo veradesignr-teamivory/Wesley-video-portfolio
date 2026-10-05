@@ -9,7 +9,7 @@
    result into DEFAULTS in src/store.tsx (or connect a real backend).
    --------------------------------------------------------------- */
 import { useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { ArrowLeft, Download, LogOut, Plus, Trash2, Upload } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowUp, Download, LogOut, Pencil, Plus, Trash2, Upload } from 'lucide-react';
 import { DEFAULTS, DESIGN_CATEGORIES, PROJECT_CATEGORIES, normalize, safeUrl, uid, useSite, type SiteData } from '../store';
 
 // SHA-256 of "<email>:<password>" — the password itself is not stored in the code
@@ -92,7 +92,7 @@ function Login({ onOk }: { onOk: () => void }) {
 
 /* ---------------- generic list manager ---------------- */
 type Kind = 'text' | 'textarea' | 'url' | 'image' | 'logo' | 'art' | 'checkbox' | 'select';
-interface FieldDef { key: string; label: string; kind?: Kind; required?: boolean; placeholder?: string; options?: readonly string[] }
+interface FieldDef { key: string; label: string; kind?: Kind; required?: boolean; placeholder?: string; options?: readonly string[]; hint?: string }
 type CollectionKey = 'projects' | 'designs' | 'experience' | 'education' | 'clients';
 
 const COLLECTIONS: Record<CollectionKey, { label: string; one: string; newestFirst: boolean; title: (x: any) => string; sub: (x: any) => string; fields: FieldDef[] }> = {
@@ -105,9 +105,9 @@ const COLLECTIONS: Record<CollectionKey, { label: string; one: string; newestFir
       { key: 'category', label: 'Category', kind: 'select', options: PROJECT_CATEGORIES },
       { key: 'year', label: 'Year' },
       { key: 'role', label: 'Your role', placeholder: 'Editor · Colorist' },
-      { key: 'videoUrl', label: 'YouTube / Vimeo link', kind: 'url', placeholder: 'https://…' },
-      { key: 'video', label: '…or a video file (.mp4 link, or /work/name.mp4 placed in the public folder)', placeholder: '/work/my-clip.mp4' },
-      { key: 'image', label: 'Thumbnail image', kind: 'image' },
+      { key: 'videoUrl', label: 'YouTube / Vimeo link', kind: 'url', placeholder: 'https://…', hint: 'Opens in the player when the card is clicked.' },
+      { key: 'video', label: 'Video file link (.mp4)', placeholder: '/work/my-clip.mp4', hint: 'Use this instead of YouTube/Vimeo for a clip hosted with the site. It previews on hover.' },
+      { key: 'image', label: 'Thumbnail image', kind: 'image', hint: 'The still shown on the card (16:9 works best).' },
       { key: 'description', label: 'Description', kind: 'textarea' },
     ],
   },
@@ -119,6 +119,7 @@ const COLLECTIONS: Record<CollectionKey, { label: string; one: string; newestFir
       { key: 'category', label: 'Discipline', kind: 'select', options: DESIGN_CATEGORIES },
       { key: 'client', label: 'Client (optional)' },
       { key: 'image', label: 'Image (JPG, PNG or WebP)', kind: 'art', required: true },
+      { key: 'link', label: 'Link (optional)', kind: 'url', placeholder: 'https://…', hint: 'The live website, Figma file, Behance or Dribbble page for this piece. Shown as a button when the image is opened.' },
       { key: 'description', label: 'Short description (optional)', kind: 'textarea' },
     ],
   },
@@ -159,73 +160,114 @@ function Collection({ name, flash }: { name: CollectionKey; flash: (m: string) =
   const def = COLLECTIONS[name];
   const items = data[name] as any[];
   const formRef = useRef<HTMLFormElement>(null);
+  const [editId, setEditId] = useState<string | null>(null);
+  const editing = items.find((x) => x.id === editId) ?? null;
+  const isImage = (k?: Kind) => k === 'image' || k === 'logo' || k === 'art';
 
-  const add = async (e: FormEvent<HTMLFormElement>) => {
+  const save = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
-    const item: Record<string, unknown> = { id: uid() };
+    const item: Record<string, unknown> = { id: editing ? editing.id : uid() };
     try {
       for (const fd of def.fields) {
-        if (fd.kind === 'image' || fd.kind === 'logo' || fd.kind === 'art') {
+        if (isImage(fd.kind)) {
           const file = f.get(fd.key) as File | null;
           const [w, h] = fd.kind === 'logo' ? [480, 480] : fd.kind === 'art' ? [1400, 1400] : [960, 540];
-          item[fd.key] = file && file.size ? await readImage(file, w, h, fd.kind === 'logo' ? 'image/png' : 'image/jpeg') : '';
+          const next = file && file.size ? await readImage(file, w, h, fd.kind === 'logo' ? 'image/png' : 'image/jpeg') : '';
+          item[fd.key] = next || (editing ? editing[fd.key] : '');   // when editing, keep the current image unless a new one is chosen
           if (fd.kind === 'art' && !item[fd.key]) throw new Error('Please choose an image.');
         } else if (fd.kind === 'checkbox') item[fd.key] = f.get(fd.key) === 'on';
-        else item[fd.key] = String(f.get(fd.key) ?? '').trim();
+        else if (fd.kind === 'url') {
+          const raw = String(f.get(fd.key) ?? '').trim();
+          if (raw && !safeUrl(raw)) throw new Error(`"${fd.label}" needs a full link starting with https://`);
+          item[fd.key] = raw;
+        } else item[fd.key] = String(f.get(fd.key) ?? '').trim();
       }
     } catch (err) { flash((err as Error).message); return; }
-    const ok = update((d) => { def.newestFirst ? (d[name] as any[]).unshift(item) : (d[name] as any[]).push(item); });
-    flash(ok ? `Added to ${def.label.toLowerCase()}.` : 'Added, but browser storage is full — it will not survive a reload.');
+    const ok = update((d) => {
+      const list = d[name] as any[];
+      if (editing) { const i = list.findIndex((x) => x.id === editing.id); if (i >= 0) list[i] = { ...list[i], ...item }; }
+      else if (def.newestFirst) list.unshift(item); else list.push(item);
+    });
+    flash(!ok ? 'Saved for now, but browser storage is full, so it will not survive a reload.' : editing ? `Saved changes to "${def.title(item)}".` : `Added to ${def.label.toLowerCase()}.`);
+    setEditId(null);
     formRef.current?.reset();
   };
 
   const remove = (id: string, title: string) => {
     if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
     update((d) => { (d as any)[name] = (d[name] as any[]).filter((x) => x.id !== id); });
+    if (editId === id) setEditId(null);
     flash(`Deleted "${title}".`);
   };
+
+  const move = (id: string, dir: -1 | 1) => {
+    update((d) => {
+      const list = d[name] as any[]; const i = list.findIndex((x) => x.id === id); const j = i + dir;
+      if (i < 0 || j < 0 || j >= list.length) return;
+      [list[i], list[j]] = [list[j], list[i]];
+    });
+  };
+
+  const iconBtn = 'shrink-0 w-8 h-8 rounded-full bg-[#212121] flex items-center justify-center transition-colors disabled:opacity-30';
 
   return (
     <div className="grid lg:grid-cols-2 gap-3 sm:gap-2 md:gap-1 items-start">
       <div className="bg-[#101010] rounded-2xl p-5 sm:p-6">
         <h2 className="text-xl text-[#E1E0CC]">{def.label} <span className="text-gray-500 text-sm">({items.length})</span></h2>
+        <p className="text-xs text-gray-500 mt-1">Shown on the site in this order. Use the arrows to reorder.</p>
         <ul className="mt-4">
-          {items.length ? items.map((x) => (
-            <li key={x.id} className="flex items-center gap-3 border-t border-white/10 py-3">
+          {items.length ? items.map((x, i) => (
+            <li key={x.id} className={`flex items-center gap-2 border-t border-white/10 py-3 ${x.id === editId ? 'bg-white/5 -mx-2 px-2 rounded-lg' : ''}`}>
               {(x.logo || x.image) && safeUrl(x.logo || x.image, true) && (
-                <img src={safeUrl(x.logo || x.image, true)} alt="" className="w-12 h-12 rounded-lg object-contain bg-black shrink-0" />
+                <img src={safeUrl(x.logo || x.image, true)} alt="" className="w-12 h-12 rounded-lg object-cover bg-black shrink-0" />
               )}
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-[#E1E0CC] truncate">{def.title(x)}</p>
                 <p className="text-xs text-gray-500 truncate">{def.sub(x)}</p>
               </div>
-              <button onClick={() => remove(x.id, def.title(x))} aria-label={`Delete ${def.title(x)}`}
-                className="shrink-0 w-9 h-9 rounded-full bg-[#212121] text-red-300 hover:bg-red-400 hover:text-black flex items-center justify-center transition-colors">
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <button onClick={() => move(x.id, -1)} disabled={i === 0} aria-label={`Move ${def.title(x)} up`} className={`${iconBtn} text-primary/70 hover:text-primary`}><ArrowUp className="w-4 h-4" /></button>
+              <button onClick={() => move(x.id, 1)} disabled={i === items.length - 1} aria-label={`Move ${def.title(x)} down`} className={`${iconBtn} text-primary/70 hover:text-primary`}><ArrowDown className="w-4 h-4" /></button>
+              <button onClick={() => { setEditId(x.id); formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} aria-label={`Edit ${def.title(x)}`} className={`${iconBtn} text-primary hover:bg-primary hover:text-black`}><Pencil className="w-4 h-4" /></button>
+              <button onClick={() => remove(x.id, def.title(x))} aria-label={`Delete ${def.title(x)}`} className={`${iconBtn} text-red-300 hover:bg-red-400 hover:text-black`}><Trash2 className="w-4 h-4" /></button>
             </li>
           )) : <li className="border-t border-white/10 py-4 text-sm text-gray-500">Nothing here yet.</li>}
         </ul>
       </div>
 
-      <form ref={formRef} onSubmit={add} className="bg-[#212121] rounded-2xl p-5 sm:p-6 space-y-4">
-        <h2 className="text-xl text-[#E1E0CC]">Add {def.one}</h2>
+      {/* key remounts the form so its fields pick up the item being edited */}
+      <form ref={formRef} key={editId ?? 'new'} onSubmit={save} className="bg-[#212121] rounded-2xl p-5 sm:p-6 space-y-4 lg:sticky lg:top-4">
+        <h2 className="text-xl text-[#E1E0CC]">{editing ? `Edit ${def.one}` : `Add ${def.one}`}</h2>
         {def.fields.map((fd) =>
           fd.kind === 'checkbox' ? (
             <label key={fd.key} className="flex items-start gap-3 text-sm text-gray-400">
-              <input type="checkbox" name={fd.key} className="mt-1 accent-[#DEDBC8]" /> {fd.label}
+              <input type="checkbox" name={fd.key} defaultChecked={Boolean(editing?.[fd.key])} className="mt-1 accent-[#DEDBC8]" /> {fd.label}
             </label>
           ) : (
             <Field key={fd.key} label={fd.label + (fd.required ? ' *' : '')}>
-              {fd.kind === 'textarea' ? <textarea name={fd.key} rows={3} className={input} />
-                : fd.kind === 'select' ? <select name={fd.key} className={input}>{(fd.options ?? []).map((o) => <option key={o}>{o}</option>)}</select>
-                : fd.kind === 'image' || fd.kind === 'logo' || fd.kind === 'art' ? <input name={fd.key} type="file" accept="image/*" className={`${input} file:mr-3 file:rounded-full file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:text-black`} />
-                : <input name={fd.key} type={fd.kind === 'url' ? 'url' : 'text'} required={fd.required} placeholder={fd.placeholder} className={input} />}
+              {fd.kind === 'textarea' ? <textarea name={fd.key} rows={3} defaultValue={editing?.[fd.key] ?? ''} className={input} />
+                : fd.kind === 'select' ? <select name={fd.key} defaultValue={editing?.[fd.key] || undefined} className={input}>
+                    {[...(fd.options ?? []), ...(editing?.[fd.key] && !(fd.options ?? []).includes(editing[fd.key]) ? [editing[fd.key]] : [])].map((o) => <option key={o}>{o}</option>)}
+                  </select>
+                : isImage(fd.kind) ? (
+                  <>
+                    {editing?.[fd.key] && safeUrl(editing[fd.key], true) && (
+                      <span className="flex items-center gap-3 mb-2 text-xs text-gray-500">
+                        <img src={safeUrl(editing[fd.key], true)} alt="" className="w-16 h-16 rounded-lg object-cover bg-black" /> Current image. Choose a file only to replace it.
+                      </span>
+                    )}
+                    <input name={fd.key} type="file" accept="image/*" className={`${input} file:mr-3 file:rounded-full file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:text-black`} />
+                  </>
+                )
+                : <input name={fd.key} type={fd.kind === 'url' ? 'url' : 'text'} required={fd.required} placeholder={fd.placeholder} defaultValue={editing?.[fd.key] ?? ''} className={input} />}
+              {fd.hint && <span className="block text-xs text-gray-500 mt-1.5">{fd.hint}</span>}
             </Field>
           ),
         )}
-        <button className={btnPrimary}><Plus className="w-4 h-4" /> Add {def.one}</button>
+        <div className="flex flex-wrap gap-2">
+          <button className={btnPrimary}>{editing ? 'Save changes' : <><Plus className="w-4 h-4" /> Add {def.one}</>}</button>
+          {editing && <button type="button" onClick={() => setEditId(null)} className={btnGhost}>Cancel</button>}
+        </div>
       </form>
     </div>
   );
@@ -245,6 +287,8 @@ function SiteSettings({ flash }: { flash: (m: string) => void }) {
       d.settings.heroTitle = String(f.get('heroTitle')).trim() || DEFAULTS.settings.heroTitle;
       d.settings.email = String(f.get('email')).trim() || DEFAULTS.settings.email;
       d.settings.whatsapp = String(f.get('whatsapp')).trim();
+      d.settings.behance = safeUrl(String(f.get('behance')));
+      d.settings.dribbble = safeUrl(String(f.get('dribbble')));
     });
     flash('Site details saved.');
   };
@@ -277,12 +321,14 @@ function SiteSettings({ flash }: { flash: (m: string) => void }) {
 
   return (
     <div className="grid lg:grid-cols-2 gap-3 sm:gap-2 md:gap-1 items-start">
-      <form onSubmit={saveBasics} key={`${s.siteName}|${s.heroTitle}|${s.email}|${s.whatsapp}`} className="bg-[#212121] rounded-2xl p-5 sm:p-6 space-y-4">
+      <form onSubmit={saveBasics} key={`${s.siteName}|${s.heroTitle}|${s.email}|${s.whatsapp}|${s.behance}|${s.dribbble}`} className="bg-[#212121] rounded-2xl p-5 sm:p-6 space-y-4">
         <h2 className="text-xl text-[#E1E0CC]">Site details</h2>
         <Field label="Website name"><input name="siteName" defaultValue={s.siteName} required className={input} /></Field>
         <Field label="Hero word (the giant name)"><input name="heroTitle" defaultValue={s.heroTitle} required className={input} /></Field>
         <Field label="Contact email (used by every button)"><input name="email" type="email" defaultValue={s.email} required className={input} /></Field>
         <Field label="WhatsApp number (with country code; leave empty to hide the button)"><input name="whatsapp" type="tel" defaultValue={s.whatsapp} placeholder="+44 7000 000000" className={input} /></Field>
+        <Field label="Behance profile link"><input name="behance" type="url" defaultValue={s.behance} placeholder="https://www.behance.net/yourname" className={input} /></Field>
+        <Field label="Dribbble profile link"><input name="dribbble" type="url" defaultValue={s.dribbble} placeholder="https://dribbble.com/yourname" className={input} /></Field>
         <button className={btnPrimary}>Save details</button>
       </form>
 

@@ -104,7 +104,7 @@ export function Clients() {
         <footer className="max-w-6xl mx-auto px-4 md:px-6 mt-8 flex flex-wrap items-center justify-between gap-4 text-xs text-gray-500">
           <span>© {new Date().getFullYear()} {settings.siteName}</span>
           <ul className="flex flex-wrap gap-x-5 gap-y-2">
-            {settings.links.filter((l) => safeUrl(l.url)).map((l) => (
+            {[...settings.links, { id: 'behance', label: 'Behance', url: settings.behance }, { id: 'dribbble', label: 'Dribbble', url: settings.dribbble }].filter((l) => safeUrl(l.url)).map((l) => (
               <li key={l.id}><a href={safeUrl(l.url)} target="_blank" rel="noopener noreferrer" className="text-primary/70 hover:text-primary">{l.label}</a></li>
             ))}
           </ul>
