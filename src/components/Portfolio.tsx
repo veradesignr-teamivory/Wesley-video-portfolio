@@ -50,7 +50,7 @@ function Card({ project, index, onOpen }: { project: Project; index: number; onO
       </div>
       <div className="p-5 sm:p-6 flex-1 flex flex-col">
         <div className="flex items-baseline justify-between gap-3">
-          <h3 className="text-lg sm:text-xl text-[#E1E0CC]">{project.title}.</h3>
+          <h3 className="text-lg sm:text-xl text-[#E1E0CC]">{/[.?!]$/.test(project.title) ? project.title : `${project.title}.`}</h3>
           <span className="text-xs text-gray-500">{project.year}</span>
         </div>
         <p className="text-xs sm:text-sm text-gray-500 mt-1">{[project.client, project.role].filter(Boolean).join(' · ')}</p>
