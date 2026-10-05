@@ -68,7 +68,22 @@ export const DEFAULTS: SiteData = {
     { id: "v1", title: "Rain to Gold", client: "", category: "Color Grading", year: "2026", role: "Colorist", description: "A rainy city street taken from a flat log profile to a warm, golden-hour grade, with the transition played out in a single shot.", videoUrl: "", video: "/work/city-street-grade.mp4", image: "/work/city-street-grade.jpg" },
     { id: "v2", title: "Into the Frame", client: "", category: "Editing", year: "2026", role: "Editor", description: "One continuous push from the editing timeline into the shot itself: from the cut, through the program monitor, out onto the open road.", videoUrl: "", video: "/work/into-the-edit.mp4", image: "/work/into-the-edit.jpg" },
   ],
-  designs: [], // visual design pieces: add them from the admin dashboard, or put files in /public/design and list them here
+  designs: [ // visual design pieces: files live in /public/design
+    { id: "g1", title: "Rwanda: Small Country, Big Momentum", category: "Social Media Design", client: "NDI", image: "/design/rwanda-momentum.webp", description: "A carousel slide pairing headline figures with a map and skyline, in a dark green brand palette." },
+    { id: "g2", title: "Vibe It Up! Issue 64", category: "Print Design", client: "Wellness Practitioners Alliance", image: "/design/vibe-it-up-magazine.webp", description: "Magazine cover design and layout, shown as a printed mockup." },
+    { id: "g3", title: "There Has to Be a Better Way", category: "Illustration", client: "", image: "/design/better-way.webp", description: "A 3D-style character illustration of a school administrator buried in paperwork." },
+    { id: "g4", title: "Learning Platform: Course Catalogue", category: "UI Design", client: "", image: "/design/lms-catalogue.webp", description: "Course listing with category, level and price filters." },
+    { id: "g5", title: "Hello August", category: "Social Media Design", client: "Niger Delta Innovate", image: "/design/hello-august.webp", description: "A new-month greeting post with bold stacked type over a circuit pattern." },
+    { id: "g6", title: "Happy Teachers' Day", category: "Social Media Design", client: "", image: "/design/teachers-day.webp", description: "A Teachers' Day greeting built on a notebook-paper collage." },
+    { id: "g7", title: "Normal People vs Cybersecurity Engineer", category: "Illustration", client: "", image: "/design/cybersecurity-engineer.webp", description: "A two-panel cartoon contrasting a quiet night with life on security watch." },
+    { id: "g8", title: "Learning Platform: Student Profile", category: "UI Design", client: "", image: "/design/lms-profile.webp", description: "Student dashboard with course progress cards and status tabs." },
+    { id: "g9", title: "Before You Start, Make Research", category: "Social Media Design", client: "Binna", image: "/design/make-research.webp", description: "A designer-tip post with a lamp-lit desk scene and glowing call to action." },
+    { id: "g10", title: "I Prepared", category: "Illustration", client: "", image: "/design/i-prepared.webp", description: "An editorial cartoon about side incomes and job security." },
+    { id: "g11", title: "Learning Platform: Account Settings", category: "UI Design", client: "", image: "/design/lms-settings.webp", description: "Profile settings with cover photo, personal details and display name." },
+    { id: "g12", title: "Learning Platform: Lesson View", category: "UI Design", client: "", image: "/design/lms-lesson.webp", description: "Lesson page with course outline, progress and exercise files." },
+    { id: "g13", title: "Learning Platform: Student Registration", category: "UI Design", client: "", image: "/design/lms-registration.webp", description: "Sign-up form for new students." },
+    { id: "g14", title: "Learning Platform: Change Password", category: "UI Design", client: "", image: "/design/lms-password.webp", description: "Password settings inside the student account area." },
+  ],
   experience: [ // (placeholder)
     { id: 'e1', role: 'Founder · Lead Editor & Motion Designer', company: 'Oversabi Studio', period: '2021 — Present', description: 'Independent post-production studio delivering edit, motion, color and sound for brands, artists and creators worldwide.' },
     { id: 'e2', role: 'Senior Video Editor', company: 'Agency / Production Company', period: '2019 — 2021', description: 'Cut commercials and branded content, and led the motion graphics toolkit for recurring clients.' },
