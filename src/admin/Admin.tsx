@@ -10,7 +10,7 @@
    --------------------------------------------------------------- */
 import { useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { ArrowLeft, Download, LogOut, Plus, Trash2, Upload } from 'lucide-react';
-import { DEFAULTS, normalize, safeUrl, uid, useSite, type SiteData } from '../store';
+import { DEFAULTS, DESIGN_CATEGORIES, PROJECT_CATEGORIES, normalize, safeUrl, uid, useSite, type SiteData } from '../store';
 
 // SHA-256 of "<email>:<password>" — the password itself is not stored in the code
 const AUTH_HASH = '5ece883efd7cc5d0d6482d096cd0dd4f6b0d53985fac2e50906caa3575b57cda';
@@ -91,9 +91,9 @@ function Login({ onOk }: { onOk: () => void }) {
 }
 
 /* ---------------- generic list manager ---------------- */
-type Kind = 'text' | 'textarea' | 'url' | 'image' | 'logo' | 'checkbox';
-interface FieldDef { key: string; label: string; kind?: Kind; required?: boolean; placeholder?: string }
-type CollectionKey = 'projects' | 'experience' | 'education' | 'clients';
+type Kind = 'text' | 'textarea' | 'url' | 'image' | 'logo' | 'art' | 'checkbox' | 'select';
+interface FieldDef { key: string; label: string; kind?: Kind; required?: boolean; placeholder?: string; options?: readonly string[] }
+type CollectionKey = 'projects' | 'designs' | 'experience' | 'education' | 'clients';
 
 const COLLECTIONS: Record<CollectionKey, { label: string; one: string; newestFirst: boolean; title: (x: any) => string; sub: (x: any) => string; fields: FieldDef[] }> = {
   projects: {
@@ -102,13 +102,24 @@ const COLLECTIONS: Record<CollectionKey, { label: string; one: string; newestFir
     fields: [
       { key: 'title', label: 'Project title', required: true },
       { key: 'client', label: 'Client' },
-      { key: 'category', label: 'Category', placeholder: 'Commercial, Music Video, YouTube…' },
+      { key: 'category', label: 'Category', kind: 'select', options: PROJECT_CATEGORIES },
       { key: 'year', label: 'Year' },
       { key: 'role', label: 'Your role', placeholder: 'Editor · Colorist' },
       { key: 'videoUrl', label: 'YouTube / Vimeo link', kind: 'url', placeholder: 'https://…' },
       { key: 'video', label: '…or a video file (.mp4 link, or /work/name.mp4 placed in the public folder)', placeholder: '/work/my-clip.mp4' },
       { key: 'image', label: 'Thumbnail image', kind: 'image' },
       { key: 'description', label: 'Description', kind: 'textarea' },
+    ],
+  },
+  designs: {
+    label: 'Visual design', one: 'design piece', newestFirst: true,
+    title: (x) => x.title, sub: (x) => [x.category, x.client].filter(Boolean).join(' · '),
+    fields: [
+      { key: 'title', label: 'Title', required: true },
+      { key: 'category', label: 'Discipline', kind: 'select', options: DESIGN_CATEGORIES },
+      { key: 'client', label: 'Client (optional)' },
+      { key: 'image', label: 'Image (JPG, PNG or WebP)', kind: 'art', required: true },
+      { key: 'description', label: 'Short description (optional)', kind: 'textarea' },
     ],
   },
   experience: {
@@ -155,9 +166,11 @@ function Collection({ name, flash }: { name: CollectionKey; flash: (m: string) =
     const item: Record<string, unknown> = { id: uid() };
     try {
       for (const fd of def.fields) {
-        if (fd.kind === 'image' || fd.kind === 'logo') {
+        if (fd.kind === 'image' || fd.kind === 'logo' || fd.kind === 'art') {
           const file = f.get(fd.key) as File | null;
-          item[fd.key] = file && file.size ? await readImage(file, fd.kind === 'logo' ? 480 : 960, fd.kind === 'logo' ? 480 : 540, fd.kind === 'logo' ? 'image/png' : 'image/jpeg') : '';
+          const [w, h] = fd.kind === 'logo' ? [480, 480] : fd.kind === 'art' ? [1400, 1400] : [960, 540];
+          item[fd.key] = file && file.size ? await readImage(file, w, h, fd.kind === 'logo' ? 'image/png' : 'image/jpeg') : '';
+          if (fd.kind === 'art' && !item[fd.key]) throw new Error('Please choose an image.');
         } else if (fd.kind === 'checkbox') item[fd.key] = f.get(fd.key) === 'on';
         else item[fd.key] = String(f.get(fd.key) ?? '').trim();
       }
@@ -206,7 +219,8 @@ function Collection({ name, flash }: { name: CollectionKey; flash: (m: string) =
           ) : (
             <Field key={fd.key} label={fd.label + (fd.required ? ' *' : '')}>
               {fd.kind === 'textarea' ? <textarea name={fd.key} rows={3} className={input} />
-                : fd.kind === 'image' || fd.kind === 'logo' ? <input name={fd.key} type="file" accept="image/*" className={`${input} file:mr-3 file:rounded-full file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:text-black`} />
+                : fd.kind === 'select' ? <select name={fd.key} className={input}>{(fd.options ?? []).map((o) => <option key={o}>{o}</option>)}</select>
+                : fd.kind === 'image' || fd.kind === 'logo' || fd.kind === 'art' ? <input name={fd.key} type="file" accept="image/*" className={`${input} file:mr-3 file:rounded-full file:border-0 file:bg-primary file:px-3 file:py-1 file:text-xs file:text-black`} />
                 : <input name={fd.key} type={fd.kind === 'url' ? 'url' : 'text'} required={fd.required} placeholder={fd.placeholder} className={input} />}
             </Field>
           ),
@@ -322,6 +336,7 @@ export function Admin() {
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'projects', label: `Portfolio · ${data.projects.length}` },
+    { id: 'designs', label: `Visual design · ${data.designs.length}` },
     { id: 'experience', label: `Experience · ${data.experience.length}` },
     { id: 'education', label: `Education · ${data.education.length}` },
     { id: 'clients', label: `Clients · ${data.clients.length}` },

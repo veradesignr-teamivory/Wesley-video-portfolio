@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight, Play, X } from 'lucide-react';
 import { WordsPullUpMultiStyle } from './WordsPullUp';
-import { safeUrl, toEmbed, useSite, type Project } from '../store';
+import { PROJECT_CATEGORIES, safeUrl, toEmbed, useSite, type Project } from '../store';
 
 function Card({ project, index, onOpen }: { project: Project; index: number; onOpen: () => void }) {
   const ref = useRef<HTMLButtonElement>(null);
@@ -119,7 +119,10 @@ export function Portfolio() {
   const { data } = useSite();
   const [filter, setFilter] = useState('All');
   const [open, setOpen] = useState<Project | null>(null);
-  const categories = ['All', ...Array.from(new Set(data.projects.map((p) => p.category).filter(Boolean)))];
+  const used = Array.from(new Set(data.projects.map((p) => p.category).filter(Boolean)));
+  const order: readonly string[] = PROJECT_CATEGORIES;
+  // known categories first, in their set order, then any custom ones
+  const categories = ['All', ...order.filter((c) => used.includes(c)), ...used.filter((c) => !order.includes(c))];
   const active = categories.includes(filter) ? filter : 'All';
   const shown = data.projects.filter((p) => active === 'All' || p.category === active);
 

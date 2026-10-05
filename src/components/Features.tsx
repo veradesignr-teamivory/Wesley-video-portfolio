@@ -1,6 +1,6 @@
 import { useRef, type ReactNode } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Box, Check, Palette, Smartphone } from 'lucide-react';
 import { WordsPullUpMultiStyle } from './WordsPullUp';
 import { features } from '../content';
 
@@ -19,6 +19,8 @@ function Card({ index, className = '', children }: { index: number; className?: 
     </motion.div>
   );
 }
+
+const ICONS = { palette: Palette, box: Box, phone: Smartphone } as const;
 
 export function Features() {
   return (
@@ -76,6 +78,36 @@ export function Features() {
               </a>
             </Card>
           ))}
+        </div>
+
+        {/* second row: visual design, animation, UGC ads */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-2 md:gap-1 mt-3 sm:mt-2 md:mt-1">
+          {features.more.map((card, i) => {
+            const Icon = ICONS[card.icon as keyof typeof ICONS];
+            return (
+              <Card key={card.number} index={i} className={`bg-[#212121] p-5 sm:p-6 flex flex-col !min-h-0 ${card.wide ? 'md:col-span-2' : ''}`}>
+                <span className="w-10 h-10 sm:w-12 sm:h-12 rounded bg-black flex items-center justify-center text-primary">
+                  <Icon className="w-5 h-5" />
+                </span>
+                <div className="flex items-baseline justify-between gap-3 mt-6 sm:mt-8">
+                  <h3 className="text-lg sm:text-xl" style={{ color: '#E1E0CC' }}>{card.title}</h3>
+                  <span className="text-xs text-gray-500">{card.number}</span>
+                </div>
+                <ul className={`mt-5 gap-x-6 gap-y-3 grid ${card.wide ? 'sm:grid-cols-2' : ''}`}>
+                  {card.items.map((item) => (
+                    <li key={item} className="flex items-start gap-2.5 text-sm text-gray-400">
+                      <Check className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <a href={card.wide ? '#design' : '#work'} className="group mt-auto pt-8 inline-flex items-center gap-2 text-sm text-primary hover:gap-3 transition-all">
+                  See the work
+                  <ArrowRight className="w-4 h-4 -rotate-45" />
+                </a>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </section>

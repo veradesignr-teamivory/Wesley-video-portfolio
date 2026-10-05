@@ -3,6 +3,7 @@ import { Hero } from './components/Hero';
 import { About } from './components/About';
 import { Features } from './components/Features';
 import { Portfolio } from './components/Portfolio';
+import { VisualDesign } from './components/VisualDesign';
 import { Studio } from './components/Studio';
 import { Credits } from './components/Credits';
 import { Clients } from './components/Clients';
@@ -31,6 +32,7 @@ export default function App() {
             <About />
             <Features />
             <Portfolio />
+            <VisualDesign />
             <Studio />
             <Credits />
             <Clients />

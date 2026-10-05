@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------
    Site data store.
    Everything the admin dashboard can change lives here: site name,
-   links, portfolio, experience, education and clients.
+   links, portfolio, visual design, experience, education and clients.
    Defaults below ship with the site; admin edits are saved to this
    browser's localStorage and override them.
    --------------------------------------------------------------- */
@@ -26,9 +26,16 @@ export interface Client {
   /** true for dark logos on a white background: they are inverted to sit on the dark site */
   invert: boolean;
 }
+/** A still piece of visual design work (logo, brand, print, book, illustration, UI...). */
+export interface Design { id: string; title: string; category: string; client: string; image: string; description: string }
 export interface SiteData {
-  settings: Settings; projects: Project[]; experience: Experience[]; education: Education[]; clients: Client[];
+  settings: Settings; projects: Project[]; designs: Design[]; experience: Experience[]; education: Education[]; clients: Client[];
 }
+
+/** Video portfolio categories, in the order their filter tabs appear. */
+export const PROJECT_CATEGORIES = ['Editing', 'Commercial', 'UGC Ads', '2D Animation', '3D Animation', 'Motion Graphics', 'Product', 'Social', 'Color Grading'] as const;
+/** Visual design disciplines. */
+export const DESIGN_CATEGORIES = ['Logo Creation', 'Branding', 'Print Design', 'Social Media Design', 'Book Design', 'Illustration', 'UI Design'] as const;
 
 export const DEFAULTS: SiteData = {
   settings: {
@@ -48,12 +55,12 @@ export const DEFAULTS: SiteData = {
     { id: "w1", title: "The Webcam Workshop", client: "CompanyFlix", category: "Editing", year: "2026", role: "Editor", description: "A two-minute promo for a webcam presenting workshop: the host to camera, intercut with audience B-roll and framed picture-in-picture inserts.", videoUrl: "", video: "/work/webcam-workshop.mp4", image: "/work/webcam-workshop.jpg" },
     { id: "w2", title: "Studio Introduction", client: "", category: "Editing", year: "2026", role: "Editor", description: "A one-minute piece to camera, tightened and finished as a clean studio introduction.", videoUrl: "", video: "/work/studio-introduction.mp4", image: "/work/studio-introduction.jpg" },
     { id: "w3", title: "Scholarstika", client: "Scholarstika", category: "Commercial", year: "2026", role: "Editor · Motion", description: "A 35-second YouTube promo for a school management platform, pairing footage with animated lower-thirds for each feature.", videoUrl: "", video: "/work/scholarstika.mp4", image: "/work/scholarstika.jpg" },
-    { id: "w4", title: "Depth", client: "", category: "Motion", year: "2026", role: "Motion Designer", description: "A 3D motion piece that floats a brand's web and mobile screens through a dark studio and closes on kinetic type.", videoUrl: "", video: "/work/depth.mp4", image: "/work/depth.jpg" },
-    { id: "w5", title: "Endless Revisions", client: "Oversabi Studio", category: "Motion", year: "2026", role: "Motion Designer", description: "An animated promo for Oversabi Studio about bringing structure to the creative process.", videoUrl: "", video: "/work/endless-revisions.mp4", image: "/work/endless-revisions.jpg" },
-    { id: "w6", title: "From Sofa to Payout", client: "LuxBet", category: "Explainer", year: "2026", role: "Editor · Animator", description: "A five-scene animated explainer that follows a bet from a message on the sofa to confirmation, the win and the payout.", videoUrl: "", video: "/work/luxbet-explainer.mp4", image: "/work/luxbet-explainer.jpg" },
-    { id: "w7", title: "FlowTask", client: "FlowTask", category: "Commercial", year: "2026", role: "Editor", description: "An eight-second SaaS ad: a presenter to camera with on-screen callouts and a cutaway to the product.", videoUrl: "", video: "/work/flowtask.mp4", image: "/work/flowtask.jpg" },
-    { id: "w8", title: "Ember & Bite", client: "Ember & Bite", category: "Commercial", year: "2026", role: "Editor", description: "An eight-second restaurant spot built around one burger and a very happy customer.", videoUrl: "", video: "/work/ember-and-bite.mp4", image: "/work/ember-and-bite.jpg" },
-    { id: "w9", title: "Glow Routine", client: "", category: "Commercial", year: "2026", role: "Editor", description: "A skincare ad in three beats: the mirror, the product to camera, and the application.", videoUrl: "", video: "/work/glow-routine.mp4", image: "/work/glow-routine.jpg" },
+    { id: "w4", title: "Depth", client: "", category: "3D Animation", year: "2026", role: "Motion Designer", description: "A 3D motion piece that floats a brand's web and mobile screens through a dark studio and closes on kinetic type.", videoUrl: "", video: "/work/depth.mp4", image: "/work/depth.jpg" },
+    { id: "w5", title: "Endless Revisions", client: "Oversabi Studio", category: "2D Animation", year: "2026", role: "Motion Designer", description: "An animated promo for Oversabi Studio about bringing structure to the creative process.", videoUrl: "", video: "/work/endless-revisions.mp4", image: "/work/endless-revisions.jpg" },
+    { id: "w6", title: "From Sofa to Payout", client: "LuxBet", category: "2D Animation", year: "2026", role: "Editor · Animator", description: "A five-scene animated explainer that follows a bet from a message on the sofa to confirmation, the win and the payout.", videoUrl: "", video: "/work/luxbet-explainer.mp4", image: "/work/luxbet-explainer.jpg" },
+    { id: "w7", title: "FlowTask", client: "FlowTask", category: "UGC Ads", year: "2026", role: "Editor", description: "An eight-second SaaS ad: a presenter to camera with on-screen callouts and a cutaway to the product.", videoUrl: "", video: "/work/flowtask.mp4", image: "/work/flowtask.jpg" },
+    { id: "w8", title: "Ember & Bite", client: "Ember & Bite", category: "UGC Ads", year: "2026", role: "Editor", description: "An eight-second restaurant spot built around one burger and a very happy customer.", videoUrl: "", video: "/work/ember-and-bite.mp4", image: "/work/ember-and-bite.jpg" },
+    { id: "w9", title: "Glow Routine", client: "", category: "UGC Ads", year: "2026", role: "Editor", description: "A skincare ad in three beats: the mirror, the product to camera, and the application.", videoUrl: "", video: "/work/glow-routine.mp4", image: "/work/glow-routine.jpg" },
     { id: "w10", title: "Marble & Serum", client: "", category: "Product", year: "2026", role: "Editor", description: "A product film for a skincare serum: the bottle on marble, a macro drop, and the texture on skin.", videoUrl: "", video: "/work/marble-serum.mp4", image: "/work/marble-serum.jpg" },
     { id: "w11", title: "Hillside Estate", client: "", category: "Commercial", year: "2026", role: "Editor", description: "A luxury real-estate teaser moving from the exterior to the living space and the view.", videoUrl: "", video: "/work/hillside-estate.mp4", image: "/work/hillside-estate.jpg" },
     { id: "w12", title: "Slow Burn", client: "", category: "Product", year: "2026", role: "Editor", description: "A slow push-in on a single candle: a calm, minimal product shot.", videoUrl: "", video: "/work/slow-burn.mp4", image: "/work/slow-burn.jpg" },
@@ -61,6 +68,7 @@ export const DEFAULTS: SiteData = {
     { id: "v1", title: "Rain to Gold", client: "", category: "Color Grading", year: "2026", role: "Colorist", description: "A rainy city street taken from a flat log profile to a warm, golden-hour grade, with the transition played out in a single shot.", videoUrl: "", video: "/work/city-street-grade.mp4", image: "/work/city-street-grade.jpg" },
     { id: "v2", title: "Into the Frame", client: "", category: "Editing", year: "2026", role: "Editor", description: "One continuous push from the editing timeline into the shot itself: from the cut, through the program monitor, out onto the open road.", videoUrl: "", video: "/work/into-the-edit.mp4", image: "/work/into-the-edit.jpg" },
   ],
+  designs: [], // visual design pieces: add them from the admin dashboard, or put files in /public/design and list them here
   experience: [ // (placeholder)
     { id: 'e1', role: 'Founder · Lead Editor & Motion Designer', company: 'Oversabi Studio', period: '2021 — Present', description: 'Independent post-production studio delivering edit, motion, color and sound for brands, artists and creators worldwide.' },
     { id: 'e2', role: 'Senior Video Editor', company: 'Agency / Production Company', period: '2019 — 2021', description: 'Cut commercials and branded content, and led the motion graphics toolkit for recurring clients.' },
@@ -124,6 +132,7 @@ export function normalize(raw: unknown): SiteData {
   d.projects = list<Project>(r.projects, ['title', 'client', 'category', 'year', 'role', 'description', 'videoUrl', 'video', 'image']) ?? d.projects;
   d.experience = list<Experience>(r.experience, ['role', 'company', 'period', 'description']) ?? d.experience;
   d.education = list<Education>(r.education, ['title', 'school', 'period', 'description']) ?? d.education;
+  d.designs = list<Design>(r.designs, ['title', 'category', 'client', 'image', 'description']) ?? d.designs;
   d.clients = list<Client>(r.clients, ['name', 'logo', 'url'], ['invert']) ?? d.clients;
   if (r.settings && typeof r.settings === 'object') {
     const s = r.settings as Partial<Settings>;

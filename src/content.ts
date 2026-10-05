@@ -23,7 +23,7 @@ export const hero = {
 };
 
 export const about = {
-  label: 'Video editing & motion design',
+  label: 'Video editing, animation & visual design',
   portrait: '/wesley.jpg', // file lives in /public
   portraitAlt: 'Wesley Tekena Junior holding a notebook and pen',
   heading: [
@@ -72,7 +72,45 @@ export const features = {
       items: ['Shot matching and look development', 'Dialogue cleanup, SFX and music edit', 'Loudness-compliant final mixes'],
     },
   ],
+  // second row of service cards
+  more: [
+    {
+      number: '04', title: 'Visual Design.', icon: 'palette', wide: true,
+      items: ['Logo creation', 'Branding', 'Print design', 'Social media design', 'Book design', 'Illustration', 'UI design'],
+    },
+    {
+      number: '05', title: '2D & 3D Animation.', icon: 'box', wide: false,
+      items: ['2D character and explainer animation', '3D modelling, lighting and animation', 'Interactive and web animation'],
+    },
+    {
+      number: '06', title: 'UGC Ads.', icon: 'phone', wide: false,
+      items: ['Creator-style ads with a presenter to camera', 'Hooks, captions and product cutaways', 'Cut for TikTok, Reels and Shorts'],
+    },
+  ],
   learnMore: { label: 'Learn more', href: '#clients' },
+};
+
+/* ---------------------------------------------------------------
+   VISUAL DESIGN: the pieces themselves are added in the admin dashboard
+   --------------------------------------------------------------- */
+export const visualDesign = {
+  label: 'Visual design',
+  heading: [
+    { text: 'Brands, books and screens,', className: 'font-normal' },
+    { text: 'designed to be remembered.', className: 'italic font-serif' },
+  ],
+  sub: 'The still side of the studio: identity, print and interface work, built with the same care as the motion.',
+  cta: 'Have a design brief in mind?',
+  // one line per discipline (keys match DESIGN_CATEGORIES in src/store.tsx)
+  blurbs: {
+    'Logo Creation': 'Marks and wordmarks that stay recognisable at any size.',
+    Branding: 'Colour, type and usage rules that keep a brand consistent everywhere.',
+    'Print Design': 'Flyers, posters, packaging and stationery, set up properly for press.',
+    'Social Media Design': 'Templates and campaign graphics made for the feed.',
+    'Book Design': 'Covers and interior layouts for print and e-book.',
+    Illustration: 'Custom artwork for brands, editorial and products.',
+    'UI Design': 'Clear, usable screens for websites and apps.',
+  } as Record<string, string>,
 };
 
 /* ---------------------------------------------------------------
@@ -153,7 +191,7 @@ export const studio = {
     groups: [
       { title: 'Video Editing', items: ['Multi-track timeline editing', 'Ripple, roll, slip and slide trims', 'Proxy workflows', 'Multicam sync and switching'] },
       { title: 'Transitions & Effects', items: ['Speed ramps and retiming', 'Smooth cuts and dissolves', 'Dynamic zooms', 'Freeze frames'] },
-      { title: 'Motion & Animation', items: ['Keyframe animation', 'Position, scale and rotation moves', 'Masking and picture-in-picture', 'Camera tracking'] },
+      { title: '2D & 3D Animation', items: ['2D character animation in Toon Boom', '3D modelling and animation in Blender', 'Interactive animation in Rive', 'Lightweight web animation with Lottie'] },
       { title: 'Color Grading', items: ['Primary wheels and curves', 'Node-based grading', 'Shot matching', 'LUT design and application'] },
       { title: 'Audio', items: ['Dialogue cleanup and noise reduction', 'EQ and compression', 'Music editing to picture', 'Loudness-compliant mixes'] },
       { title: 'Titles & Graphics', items: ['Lower thirds and end screens', 'Animated captions', 'Title sequences', 'Credit rolls'] },
@@ -168,9 +206,10 @@ export const studio = {
       { name: 'Adobe Premiere Pro', value: 95 },
       { name: 'Adobe After Effects', value: 95 },
       { name: 'DaVinci Resolve (Color & Fairlight)', value: 90 },
-      { name: 'Final Cut Pro', value: 80 },
-      { name: 'Cinema 4D', value: 70 },
-      { name: 'Blender', value: 70 },
+      { name: 'Blender', value: 85 },
+      { name: 'Toon Boom Harmony', value: 85 },
+      { name: 'Rive', value: 80 },
+      { name: 'Lottie', value: 80 },
     ],
   },
 };
