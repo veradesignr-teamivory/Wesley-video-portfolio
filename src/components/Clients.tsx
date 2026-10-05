@@ -108,6 +108,7 @@ export function Clients() {
               <li key={l.id}><a href={safeUrl(l.url)} target="_blank" rel="noopener noreferrer" className="text-primary/70 hover:text-primary">{l.label}</a></li>
             ))}
           </ul>
+          <a href="/Wesley-Tekena-Junior-CV.pdf" download className="text-primary/70 hover:text-primary">Download CV</a>
           <a href="#/admin" className="hover:text-primary">Admin</a>
         </footer>
       </div>

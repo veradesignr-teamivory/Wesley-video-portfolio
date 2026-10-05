@@ -25,6 +25,7 @@ export const hero = {
 export const about = {
   label: 'Video editing, animation & visual design',
   portrait: '/wesley.jpg', // file lives in /public
+  cv: '/Wesley-Tekena-Junior-CV.pdf', // rebuilt with: python scripts/make_cv.py public/Wesley-Tekena-Junior-CV.pdf
   portraitAlt: 'Wesley Tekena Junior holding a notebook and pen',
   heading: [
     { text: 'I am Wesley Tekena Junior,', className: 'font-normal' },

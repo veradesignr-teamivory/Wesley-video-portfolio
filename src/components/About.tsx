@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { motion, useInView, useScroll, useTransform, type MotionValue } from 'framer-motion';
+import { Download } from 'lucide-react';
 import { WordsPullUpMultiStyle } from './WordsPullUp';
 import { about } from '../content';
 import { useSite } from '../store';
@@ -62,6 +63,17 @@ export function About() {
             <AnimatedLetter key={i} char={char} index={i} total={chars.length} progress={scrollYProgress} />
           ))}
         </p>
+
+        <a
+          href={about.cv}
+          download
+          className="group inline-flex items-center gap-2 hover:gap-3 transition-all bg-primary rounded-full pl-5 pr-1 py-1 text-black font-medium text-sm sm:text-base mt-8"
+        >
+          Download CV
+          <span className="bg-black rounded-full w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center transition-transform group-hover:scale-110">
+            <Download className="w-4 h-4 text-primary" />
+          </span>
+        </a>
         </div>
       </div>
     </section>
