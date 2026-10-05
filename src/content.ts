@@ -28,8 +28,8 @@ export const about = {
   portraitAlt: 'Wesley Tekena Junior holding a notebook and pen',
   heading: [
     { text: 'I am Wesley Tekena Junior,', className: 'font-normal' },
-    { text: 'an editor and motion designer.', className: 'italic font-serif' },
-    { text: 'I have skills in color grading, sound design, and 3D & VFX.', className: 'font-normal' },
+    { text: 'a brand strategist and motion designer.', className: 'italic font-serif' },
+    { text: 'I have skills in color grading, animation, graphic design, and VFX.', className: 'font-normal' },
   ],
   body:
     "I run {site}, cutting commercials, music videos, brand films and creator content, and designing the motion that holds them together. My work lives where rhythm meets clarity: the cut you feel but don't notice, the title that lands on the beat, the grade that makes a frame feel expensive.",
