@@ -47,8 +47,8 @@ export const DEFAULTS: SiteData = {
     heroTitle: 'Wesley',
     email: 'veradesignr@gmail.com',
     whatsapp: '+44 7770208286',
-    behance: '',  // e.g. https://www.behance.net/yourname
-    dribbble: '', // e.g. https://dribbble.com/yourname
+    behance: 'https://www.behance.net/tekenawestjunior',
+    dribbble: 'https://dribbble.com/tekenawestjunior',
     links: [ // (placeholder URLs)
       { id: 'l1', label: 'YouTube', url: 'https://youtube.com/' },
       { id: 'l2', label: 'Instagram', url: 'https://instagram.com/' },
